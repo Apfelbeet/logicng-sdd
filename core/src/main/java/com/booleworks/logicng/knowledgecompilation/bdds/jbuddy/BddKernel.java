@@ -323,11 +323,12 @@ public class BddKernel {
         }
     }
 
-    protected int apply(final int l, final int r, final Operand op) {
-        return doWithPotentialReordering(() -> applyRec(l, r, op));
+    protected int apply(final int l, final int r, final Operand op, final ComputationHandler handler) {
+        return doWithPotentialReordering(() -> applyRec(l, r, op, handler));
     }
 
-    protected int applyRec(final int l, final int r, final Operand op) throws BddReorderRequest {
+    protected int applyRec(final int l, final int r, final Operand op, final ComputationHandler handler)
+            throws BddReorderRequest {
         final int res;
         switch (op) {
             case AND:
@@ -377,17 +378,20 @@ public class BddKernel {
             if (entry.a == l && entry.b == r && entry.c == op.v) {
                 return entry.res;
             }
+            if (!handler.shouldResume(SimpleEvent.BDD_NEW_NODE)) {
+                return BDD_ABORT;
+            }
             if (level(l) == level(r)) {
-                pushRef(applyRec(low(l), low(r), op));
-                pushRef(applyRec(high(l), high(r), op));
+                pushRef(applyRec(low(l), low(r), op, handler));
+                pushRef(applyRec(high(l), high(r), op, handler));
                 res = makeNode(level(l), readRef(2), readRef(1));
             } else if (level(l) < level(r)) {
-                pushRef(applyRec(low(l), r, op));
-                pushRef(applyRec(high(l), r, op));
+                pushRef(applyRec(low(l), r, op, handler));
+                pushRef(applyRec(high(l), r, op, handler));
                 res = makeNode(level(l), readRef(2), readRef(1));
             } else {
-                pushRef(applyRec(l, low(r), op));
-                pushRef(applyRec(l, high(r), op));
+                pushRef(applyRec(l, low(r), op, handler));
+                pushRef(applyRec(l, high(r), op, handler));
                 res = makeNode(level(r), readRef(2), readRef(1));
             }
             popref(2);

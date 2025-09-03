@@ -4,6 +4,9 @@
 
 package com.booleworks.logicng.knowledgecompilation.bdds.jbuddy;
 
+import com.booleworks.logicng.handlers.ComputationHandler;
+import com.booleworks.logicng.handlers.NopHandler;
+
 /**
  * This class provides abstractions for the construction of BDDs.
  * @version 2.0.0
@@ -93,8 +96,8 @@ public class BddConstruction {
      * @param r the second BDD
      * @return the conjunction of the two BDDs
      */
-    public int and(final int l, final int r) {
-        return k.apply(l, r, BddKernel.Operand.AND);
+    public int and(final int l, final int r, final ComputationHandler handler) {
+        return k.apply(l, r, BddKernel.Operand.AND, handler);
     }
 
     /**
@@ -103,8 +106,8 @@ public class BddConstruction {
      * @param r the second BDD
      * @return the disjunction of the two BDDs
      */
-    public int or(final int l, final int r) {
-        return k.apply(l, r, BddKernel.Operand.OR);
+    public int or(final int l, final int r, final ComputationHandler handler) {
+        return k.apply(l, r, BddKernel.Operand.OR, handler);
     }
 
     /**
@@ -113,8 +116,8 @@ public class BddConstruction {
      * @param r the second BDD
      * @return the implication of the two BDDs
      */
-    public int implication(final int l, final int r) {
-        return k.apply(l, r, BddKernel.Operand.IMP);
+    public int implication(final int l, final int r, final ComputationHandler handler) {
+        return k.apply(l, r, BddKernel.Operand.IMP, handler);
     }
 
     /**
@@ -123,8 +126,8 @@ public class BddConstruction {
      * @param r the second BDD
      * @return the equivalence of the two BDDs
      */
-    public int equivalence(final int l, final int r) {
-        return k.apply(l, r, BddKernel.Operand.EQUIV);
+    public int equivalence(final int l, final int r, final ComputationHandler handler) {
+        return k.apply(l, r, BddKernel.Operand.EQUIV, handler);
     }
 
     /**
@@ -241,7 +244,7 @@ public class BddConstruction {
         k.pushRef(quantRec(k.low(r), op, quantid));
         k.pushRef(quantRec(k.high(r), op, quantid));
         if (invarset(k.level(r))) {
-            res = k.applyRec(k.readRef(2), k.readRef(1), op);
+            res = k.applyRec(k.readRef(2), k.readRef(1), op, NopHandler.get());
         } else {
             res = k.makeNode(k.level(r), k.readRef(2), k.readRef(1));
         }

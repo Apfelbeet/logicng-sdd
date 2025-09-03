@@ -5,6 +5,7 @@
 package com.booleworks.logicng.handlers;
 
 import static com.booleworks.logicng.handlers.events.ComputationStartedEvent.BDD_COMPUTATION_STARTED;
+import static com.booleworks.logicng.handlers.events.SimpleEvent.BDD_NEW_NODE;
 import static com.booleworks.logicng.handlers.events.SimpleEvent.BDD_NEW_REF_ADDED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -73,6 +74,7 @@ class TimeoutBddHandlerTest {
         final ComputationHandler handler = Mockito.mock(ComputationHandler.class);
         final AtomicInteger count = new AtomicInteger(0);
         when(handler.shouldResume(eq(BDD_COMPUTATION_STARTED))).thenReturn(true);
+        when(handler.shouldResume(eq(BDD_NEW_NODE))).thenReturn(true);
         when(handler.shouldResume(eq(BDD_NEW_REF_ADDED))).thenAnswer(invocationOnMock -> count.addAndGet(1) < 5);
 
         final LngResult<Bdd> result = BddFactory.build(f, formula, kernel, handler);

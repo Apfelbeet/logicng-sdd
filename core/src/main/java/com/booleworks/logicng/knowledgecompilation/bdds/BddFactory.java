@@ -148,7 +148,7 @@ public final class BddFactory {
                 idx = kernel.getOrAddVarIndex(lit.variable());
                 final int operand = lit.getPhase() ? construction.ithVar(idx) : construction.nithVar(idx);
                 final int previous = bdd;
-                bdd = kernel.addRef(construction.and(bdd, operand), NopHandler.get());
+                bdd = kernel.addRef(construction.and(bdd, operand, NopHandler.get()), NopHandler.get());
                 kernel.delRef(previous);
                 kernel.delRef(operand);
             }
@@ -202,8 +202,8 @@ public final class BddFactory {
                 if (right == BddKernel.BDD_ABORT) {
                     return BddKernel.BDD_ABORT;
                 }
-                int res = kernel.addRef(binary instanceof Implication ? construction.implication(left, right)
-                        : construction.equivalence(left, right), handler);
+                int res = kernel.addRef(binary instanceof Implication ? construction.implication(left, right, handler)
+                        : construction.equivalence(left, right, handler), handler);
                 kernel.delRef(left);
                 kernel.delRef(right);
                 return res;
@@ -220,8 +220,11 @@ public final class BddFactory {
                         return BddKernel.BDD_ABORT;
                     }
                     final int previous = res;
-                    res = formula instanceof And ? kernel.addRef(construction.and(res, operand), handler)
-                            : kernel.addRef(construction.or(res, operand), handler);
+                    res = formula instanceof And ? kernel.addRef(construction.and(res, operand, handler), handler)
+                            : kernel.addRef(construction.or(res, operand, handler), handler);
+                    if (res == BddKernel.BDD_ABORT) {
+                        return BddKernel.BDD_ABORT;
+                    }
                     kernel.delRef(previous);
                     kernel.delRef(operand);
                 }
